@@ -12,13 +12,8 @@ import paymentRouter from "./routes/payment.route.js";
 
 //app initialize express through
 const app = express();
-<<<<<<< HEAD
 app.use(cors({
-    origin:"https://interviewiq-client-mky6.onrender.com",  // we have to give origin here
-=======
-app.use(cors({// we have to give origin here
     origin: process.env.CLIENT_URL || "http://localhost:5173",
->>>>>>> 9cf5917 (Fix authentication token issue)
     credentials:true
 
 }))

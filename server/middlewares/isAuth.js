@@ -21,6 +21,9 @@ next()
 
 
 }catch(error){
+ if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
+     return res.status(401).json({message:"Authentication required. Please sign in again."})
+ }
 
  return res.status(500).json({message:`isAuth error ${error} `})
 

@@ -48,7 +48,11 @@ return res.status(200).json(user) // 200-300 then code successful and 400 then f
 
 export const logout = async (req, res) => {
     try{
-await res.clearCookie("token")
+await res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none"
+})
 return res.status(200).json({message:"Logout Successfully"})
 
     }catch(error){
