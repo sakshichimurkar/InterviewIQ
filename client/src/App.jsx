@@ -10,7 +10,11 @@ import InterviewReport from './pages/InterviewReport'
 import InterviewHistory from './pages/InterviewHistory'
 import Pricing from './pages/Pricing'
 
+<<<<<<< HEAD
 export const ServerUrl = 'https://interviewiq-xxgb.onrender.com'
+=======
+export const ServerUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:8000'
+>>>>>>> 9cf5917 (Fix authentication token issue)
 
 function App() {
   const dispatch = useDispatch()
