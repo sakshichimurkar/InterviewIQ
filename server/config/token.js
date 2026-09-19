@@ -5,7 +5,7 @@ const genToken = async (userId) => {// user id which get from db that we
     // in this way we can find user
 
     try{
-const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn:"7d"})
+const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn:"30d"})
     return token //if token not return it will not store
     } catch (error) {
 
