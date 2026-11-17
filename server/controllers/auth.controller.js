@@ -1,65 +1,95 @@
-import User from "../models/user.model.js"
-import genToken from "../config/token.js"
 
-// from frontend we will bring data mail email anything
+import User from "../models/user.model.js";
+import genToken from "../config/token.js";
 
-//frontend data 
-//create user
-//token
-//cookie
+// Google Authentication
+// 1. Get user data from frontend
+// 2. Find or create user in database
+// 3. Generate JWT token
+// 4. Save token in HTTP-only cookie
 
 export const googleAuth = async (req, res) => {
-try{
-    const {name, email} = req.body
-    if (!name || !email) {
-        return res.status(400).json({message: "Name and email are required"})
+    try {
+        const { name, email } = req.body;
+
+        // Validate frontend data
+        if (!name || !email) {
+            return res.status(400).json({
+                message: "Name and email are required"
+            });
+        }
+
+        // Check whether user already exists
+        let user = await User.findOne({ email });
+
+        // Create user if not found
+        if (!user) {
+            user = await User.create({
+                name,
+                email
+            });
+        }
+
+        // Generate JWT token
+        const token = await genToken(user._id);
+
+        if (!token) {
+            return res.status(500).json({
+                message: "Failed to generate authentication token"
+            });
+        }
+
+        // Save JWT token in browser cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Google login successful",
+            user
+        });
+
+    } catch (error) {
+        console.error("Google authentication error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Google authentication failed",
+            error: error.message
+        });
     }
-//here we have to check user is in database or not
-  let user = await User.findOne({email})   // database ke andar jo data jata hai wo generally module me save hota hai
-if (!user){
-user = await User.create({
+};
 
-    name ,
-    email
 
-})
-}
-
-//now token create annd save to the cookie
-
-let token = await genToken(user._id) //if want to access anything from the db _id and name , with this token will create
-res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",  // THIS FIXES YOUR ISSUE
-    maxAge: 30 * 24 * 60 * 60 * 1000
-});
-
-return res.status(200).json(user) // 200-300 then code successful and 400 then frontend error 500-600 then server error
-} catch (error){
- return res.status(500).json({message:`Google auth error ${error} `})
-
-}
-
-}
+// Logout User
+// Clear authentication cookie
 
 export const logout = async (req, res) => {
-    try{
-await res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/"
-});
-return res.status(200).json({message:"Logout Successfully"})
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path: "/"
+        });
 
-    }catch(error){
-         return res.status(500).json({message:`Logout error ${error} `})
+        return res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
 
+    } catch (error) {
+        console.error("Logout error:", error);
 
-        
+        return res.status(500).json({
+            success: false,
+            message: "Logout failed",
+            error: error.message
+        });
     }
-}
-
-// if app not getting current user that means user not authenticate we will clear cookie here
+};
