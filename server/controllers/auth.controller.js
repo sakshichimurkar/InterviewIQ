@@ -28,15 +28,13 @@ user = await User.create({
 //now token create annd save to the cookie
 
 let token = await genToken(user._id) //if want to access anything from the db _id and name , with this token will create
-res.cookie("token" , token, {
-
+res.cookie("token", token, {
     httpOnly: true,
-    secure: true ,
-    sameSite:"none",
-    maxAge:30 * 24 * 60 * 60 *1000//30 days
-
-
-})
+    secure: true,
+    sameSite: "none",
+    path: "/",  // THIS FIXES YOUR ISSUE
+    maxAge: 30 * 24 * 60 * 60 * 1000
+});
 
 return res.status(200).json(user) // 200-300 then code successful and 400 then frontend error 500-600 then server error
 } catch (error){
@@ -51,8 +49,9 @@ export const logout = async (req, res) => {
 await res.clearCookie("token", {
     httpOnly: true,
     secure: true,
-    sameSite: "none"
-})
+    sameSite: "none",
+    path: "/"
+});
 return res.status(200).json({message:"Logout Successfully"})
 
     }catch(error){
